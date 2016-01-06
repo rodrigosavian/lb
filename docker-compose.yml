@@ -1,11 +1,10 @@
 app:
   image: tutum/hello-world:latest
-  environment:
-    SERVICE_80_NAME: http
-    SERVICE_NAME: app
-    SERVICE_TAGS: production
   ports:
-  - "80"
+   - "80"
+  links:
+   - redis
+  env_file: .env
 
 lb:
   build: ./
@@ -13,6 +12,9 @@ lb:
   - consul
   ports:
   - "80:80"
+
+redis:
+  image: redis
 
 consul:
   command: -server -bootstrap -advertise 10.0.2.15
@@ -25,7 +27,7 @@ consul:
 
 registrator:
   command: consul://consul:8500
-  image: progrium/registrator:latest
+  image: gliderlabs/registrator:latest
   links:
   - consul
   volumes:
